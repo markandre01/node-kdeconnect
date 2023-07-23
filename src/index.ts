@@ -234,8 +234,8 @@ class KDEDevice extends KDEBase {
 		this.wrapCheckSetup()
 		return fun
 	}
-	
-	private wrapCheckSetup(){
+
+	private wrapCheckSetup() {
 		if (!this._setupDone) {
 			throw new Error('KDEDevice was not setup. Please call .setup()')
 		}
