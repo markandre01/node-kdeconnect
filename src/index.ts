@@ -231,8 +231,10 @@ class KDEDevice extends KDEBase {
 
 
 	private wrapCheckDeorator<T extends (...a: any[]) => any>(fun: T): T {
-		this.wrapCheckSetup()
-		return fun
+		return ((...a: any[]) => {
+			this.wrapCheckSetup()
+			return fun(...a)
+		}) as T
 	}
 
 	private wrapCheckSetup() {
@@ -380,6 +382,14 @@ class KDEDevice extends KDEBase {
 }
 
 export async function getAvailableDevices() {
-	const obj = await sessionBus().getProxyObject('org.kde.kdeconnect.daemon', '/modules/kdeconnect/devices')
-	return obj.nodes.map(i => new KDEDevice(i.slice(i.lastIndexOf('/') + 1)))
+	const bus = sessionBus()
+	const obj = await bus.getProxyObject('org.kde.kdeconnect.daemon', '/modules/kdeconnect/devices')
+	const dev = obj.nodes.map(i => new KDEDevice(i.slice(i.lastIndexOf('/') + 1), bus))
+	for(const i of dev){
+		await i.setup()
+	}
+
+	return dev
 }
+
+getAvailableDevices()
