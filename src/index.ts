@@ -1,8 +1,8 @@
 'use strict';
 
-import { ClientInterface, MessageBus, Variant, sessionBus } from "dbus-next";
-import EventEmitter from "eventemitter3";
-import path from "path";
+import { ClientInterface, MessageBus, Variant, sessionBus } from 'dbus-next';
+import EventEmitter from 'eventemitter3';
+import path from 'path';
 
 class KDEBase {
 	protected _id: string
@@ -13,7 +13,7 @@ class KDEBase {
 			path = `/${path}`
 		}
 
-		return await this._bus.getProxyObject("org.kde.kdeconnect.daemon", `/modules/kdeconnect/devices/${this._id}${path}`)
+		return await this._bus.getProxyObject('org.kde.kdeconnect.daemon', `/modules/kdeconnect/devices/${this._id}${path}`)
 	}
 
 	protected async getInterface(path: string, name: string) {
@@ -21,10 +21,10 @@ class KDEBase {
 	}
 
 	protected async getPropertiesOfInterface(path: string, interfaceName: string) {
-		let obj = await this.getProxyObject(path)
+		const obj = await this.getProxyObject(path)
 
-		let entries = await obj.getInterface("org.freedesktop.DBus.Properties").GetAll(interfaceName) as { [key: string]: Variant }
-		for (let i in entries) {
+		const entries = await obj.getInterface('org.freedesktop.DBus.Properties').GetAll(interfaceName) as { [key: string]: Variant }
+		for (const i in entries) {
 			entries[i] = entries[i].value
 		}
 
@@ -60,7 +60,7 @@ class KDENotification extends KDEBase {
 	}
 
 	private async retrieveData() {
-		let {
+		const {
 			appName,
 			dismissable,
 			hasIcon,
@@ -68,7 +68,7 @@ class KDENotification extends KDEBase {
 			text,
 			ticker,
 			title,
-		} = await this.getPropertiesOfInterface("", "org.kde.kdeconnect.device.notifications.notification") as any
+		} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device.notifications.notification')
 		this.appName = appName
 		this.dismissable = dismissable
 		this.hasIcon = hasIcon
@@ -85,7 +85,7 @@ class KDENotification extends KDEBase {
 			return false
 		}
 
-		let i = await this.getInterface("", "org.kde.kdeconnect.device.notifications.notification")
+		const i = await this.getInterface('', 'org.kde.kdeconnect.device.notifications.notification')
 		i.dismiss()
 
 		return true
@@ -93,7 +93,7 @@ class KDENotification extends KDEBase {
 }
 
 interface eKDEMediaHandler {
-	"onMediaPlayerUpdated": () => void
+	'onMediaPlayerUpdated': () => void
 }
 
 class KDEMediaHandler extends KDEBase {
@@ -124,7 +124,7 @@ class KDEMediaHandler extends KDEBase {
 	mediaDataLoaded: Promise<void>
 
 	protected async getProxyObject() {
-		return await super.getProxyObject("mprisremote")
+		return await super.getProxyObject('mprisremote')
 	}
 
 	constructor(id: string, bus = sessionBus()) {
@@ -145,18 +145,18 @@ class KDEMediaHandler extends KDEBase {
 
 	private async init() {
 		await this.retrieveData()
-		let i = await this.getInterface("", "org.kde.kdeconnect.device.mprisremote")
-		i.on("propertiesChanged", this.retrieveData.bind(this))
-		this.Next = this.createRunCommandFun(i, "Next")
-		this.Previous = this.createRunCommandFun(i, "Previous")
-		this.Pause = this.createRunCommandFun(i, "Pause")
-		this.PlayPause = this.createRunCommandFun(i, "PlayPause")
-		this.Stop = this.createRunCommandFun(i, "Stop")
-		this.Play = this.createRunCommandFun(i, "Play")
+		const i = await this.getInterface('', 'org.kde.kdeconnect.device.mprisremote')
+		i.on('propertiesChanged', this.retrieveData.bind(this))
+		this.Next = this.createRunCommandFun(i, 'Next')
+		this.Previous = this.createRunCommandFun(i, 'Previous')
+		this.Pause = this.createRunCommandFun(i, 'Pause')
+		this.PlayPause = this.createRunCommandFun(i, 'PlayPause')
+		this.Stop = this.createRunCommandFun(i, 'Stop')
+		this.Play = this.createRunCommandFun(i, 'Play')
 	}
 
 	private async retrieveData() {
-		let {
+		const {
 			volume,
 			length,
 			isPlaying,
@@ -167,7 +167,7 @@ class KDEMediaHandler extends KDEBase {
 			artist,
 			album,
 			canSeek,
-		} = await this.getPropertiesOfInterface("", "org.kde.kdeconnect.device.mprisremote") as any
+		} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device.mprisremote')
 
 		this._volume = volume
 		this._length = length
@@ -179,18 +179,18 @@ class KDEMediaHandler extends KDEBase {
 		this._artist = artist
 		this._album = album
 		this._canSeek = canSeek
-		this.events.emit("onMediaPlayerUpdated")
+		this.events.emit('onMediaPlayerUpdated')
 	}
 }
 
 interface eKDEDevice {
-	"onTrustedChanged": (v: boolean) => void
-	"onNameChanged": (v: string) => void
-	"onTypeChanged": (v: string) => void
-	"onReachableChanged": (v: boolean) => void
-	"onBatteryChanged": (v: iKDEDeviceBattery) => void
-	"onConnectivityChanged": (v: iKDEDeviceConnectivity) => void
-	"onChanged": () => void
+	'onTrustedChanged': (v: boolean) => void
+	'onNameChanged': (v: string) => void
+	'onTypeChanged': (v: string) => void
+	'onReachableChanged': (v: boolean) => void
+	'onBatteryChanged': (v: iKDEDeviceBattery) => void
+	'onConnectivityChanged': (v: iKDEDeviceConnectivity) => void
+	'onChanged': () => void
 }
 
 interface iKDEDeviceBattery {
@@ -207,10 +207,10 @@ class KDEDevice extends KDEBase {
 	events = new EventEmitter<eKDEDevice>()
 
 	private _setupDone = false
-	private _name = ""
+	private _name = ''
 	private _isReachable = false
 	private _isTrusted = false
-	private _type = ""
+	private _type = ''
 
 	private _battery?: iKDEDeviceBattery
 	private _connectivity?: iKDEDeviceConnectivity
@@ -234,70 +234,71 @@ class KDEDevice extends KDEBase {
 		this.wrapCheckSetup()
 		return fun
 	}
-	private wrapCheckSetup(): any {
+	
+	private wrapCheckSetup(){
 		if (!this._setupDone) {
-			throw new Error("KDEDevice was not setup. Please call .setup()")
+			throw new Error('KDEDevice was not setup. Please call .setup()')
 		}
 		if (!this._isReachable) {
-			throw new Error("Cannot connect to KDEDevice!")
+			throw new Error('Cannot connect to KDEDevice!')
 		}
 
-
+		return Promise.resolve()
 	}
 
 	private async iSetup() {
 		{
-			let {
+			const {
 				charge,
 				isCharging
-			} = await this.getPropertiesOfInterface("battery", "org.kde.kdeconnect.device.battery")
+			} = await this.getPropertiesOfInterface('battery', 'org.kde.kdeconnect.device.battery')
 			this._battery = {
 				charge,
 				charging: isCharging
 			}
 
-			let interf = await this.getInterface("battery", "org.kde.kdeconnect.device.battery")
-			interf.on("refreshed", (charging: boolean, charge: number) => {
+			const interf = await this.getInterface('battery', 'org.kde.kdeconnect.device.battery')
+			interf.on('refreshed', (charging: boolean, charge: number) => {
 				this._battery = {
 					charge,
 					charging
 				}
-				this.events.emit("onBatteryChanged", this._battery)
+				this.events.emit('onBatteryChanged', this._battery)
 			})
 		}
 
 		{
-			let {
+			const {
 				cellularNetworkType: type,
 				cellularNetworkStrength: strength
-			} = await this.getPropertiesOfInterface("connectivity_report", "org.kde.kdeconnect.device.connectivity_report")
+			} = await this.getPropertiesOfInterface('connectivity_report', 'org.kde.kdeconnect.device.connectivity_report')
 			this._connectivity = {
 				type,
 				strength
 			}
 
-			let interf = await this.getInterface("connectivity_report", "org.kde.kdeconnect.device.connectivity_report")
-			interf.on("refreshed", (type: string, strength: number) => {
+			const interf = await this.getInterface('connectivity_report', 'org.kde.kdeconnect.device.connectivity_report')
+			interf.on('refreshed', (type: string, strength: number) => {
 				this._connectivity = {
 					type,
 					strength
 				}
-				this.events.emit("onConnectivityChanged", this._connectivity)
+				this.events.emit('onConnectivityChanged', this._connectivity)
 			})
 
 		}
 		{
-			let interf = await this.getInterface("findmyphone", "org.kde.kdeconnect.device.findmyphone")
+			const interf = await this.getInterface('findmyphone', 'org.kde.kdeconnect.device.findmyphone')
 			this.ring = this.wrapCheckDeorator(interf.ring as any)
 		}
 
 		{
-			let interf = await this.getInterface("ping", "org.kde.kdeconnect.device.ping")
-			this.ping = this.wrapCheckDeorator(async msg => await interf.sendPing(msg ?? ""))
+			const interf = await this.getInterface('ping', 'org.kde.kdeconnect.device.ping')
+			this.ping = this.wrapCheckDeorator(async msg => await interf.sendPing(msg ?? ''))
 		}
 
 		{
-			let interf = await this.getInterface("share", "org.kde.kdeconnect.device.share")
+			const interf = await this.getInterface('share', 'org.kde.kdeconnect.device.share')
 			this.shareURL = this.wrapCheckDeorator(interf.shareUrl as any)
 			this.shareText = this.wrapCheckDeorator(interf.shareText as any)
 		}
@@ -305,19 +306,19 @@ class KDEDevice extends KDEBase {
 
 	async setup() {
 		{
-			let {
+			const {
 				isReachable,
 				isTrusted,
 				name,
 				type
-			} = await this.getPropertiesOfInterface("", "org.kde.kdeconnect.device")
+			} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device')
 			this._isReachable = isReachable
 			this._isTrusted = isTrusted
 			this._name = name
 			this._type = type
 
-			let interf = await this.getInterface("", "org.kde.kdeconnect.device")
-			interf.on("reachableChanged", i => {
+			const interf = await this.getInterface('', 'org.kde.kdeconnect.device')
+			interf.on('reachableChanged', i => {
 				this._isReachable = i
 				if (i) {
 					this.iSetup()
@@ -325,19 +326,19 @@ class KDEDevice extends KDEBase {
 					this._battery = undefined
 					this._connectivity = undefined
 				}
-				this.events.emit("onReachableChanged", i)
+				this.events.emit('onReachableChanged', i)
 			})
-			interf.on("trustedChanged", i => {
+			interf.on('trustedChanged', i => {
 				this._isTrusted = i
-				this.events.emit("onTrustedChanged", i)
+				this.events.emit('onTrustedChanged', i)
 			})
-			interf.on("nameChanged", i => {
+			interf.on('nameChanged', i => {
 				this._name = i
-				this.events.emit("onNameChanged", i)
+				this.events.emit('onNameChanged', i)
 			})
-			interf.on("typeChanged", i => {
+			interf.on('typeChanged', i => {
 				this._type = i
-				this.events.emit("onTypeChanged", i)
+				this.events.emit('onTypeChanged', i)
 			})
 		}
 
@@ -350,10 +351,10 @@ class KDEDevice extends KDEBase {
 
 	async getNotifications() {
 		this.wrapCheckSetup()
-		let interf = await this.getInterface("notifications", "org.kde.kdeconnect.device.notifications")
-		let av = await interf.activeNotifications() as number[]
+		const interf = await this.getInterface('notifications', 'org.kde.kdeconnect.device.notifications')
+		const av = await interf.activeNotifications() as number[]
 
-		let r = av.map(i => new KDENotification(this.id, i, this._bus))
+		const r = av.map(i => new KDENotification(this.id, i, this._bus))
 
 		await Promise.all(r.map(i => i.notificationDataLoaded))
 
@@ -367,7 +368,7 @@ class KDEDevice extends KDEBase {
 
 	async getMediaControl() {
 		this.wrapCheckSetup()
-		let n = new KDEMediaHandler(`/modules/kdeconnect/devices/${this.id}`, this._bus)
+		const n = new KDEMediaHandler(`/modules/kdeconnect/devices/${this.id}`, this._bus)
 		await n.mediaDataLoaded
 		return n
 	}
@@ -379,6 +380,6 @@ class KDEDevice extends KDEBase {
 }
 
 export async function getAvailableDevices() {
-	let obj = await sessionBus().getProxyObject("org.kde.kdeconnect.daemon", "/modules/kdeconnect/devices")
-	return obj.nodes.map(i => new KDEDevice(i.slice(i.lastIndexOf("/") + 1)))
+	const obj = await sessionBus().getProxyObject('org.kde.kdeconnect.daemon', '/modules/kdeconnect/devices')
+	return obj.nodes.map(i => new KDEDevice(i.slice(i.lastIndexOf('/') + 1)))
 }

@@ -1,19 +1,18 @@
 {
-  "name": "typescript-template",
-  "version": "1.0.7",
-  "description": "A complete Node.js project template using TypeScript and following general best practices.",
+  "name": "kdeconnect",
+  "version": "0.0.1",
+  "description": "KDEConnect bindings for Node",
   "keywords": [
     "typescript",
     "template"
   ],
   "author": {
-    "name": "Chris Wells",
-    "url": "https://chriswells.io"
+    "name": "Mark-André Schadow"
   },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chriswells0/node-typescript-template.git"
+    "url": "https://github.com/markandre01/node-kdeconnect"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
