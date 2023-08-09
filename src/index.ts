@@ -1,5 +1,3 @@
-'use strict';
-
 import { ClientInterface, MessageBus, Variant, sessionBus } from 'dbus-next';
 import EventEmitter from 'eventemitter3';
 import path from 'path';
@@ -38,16 +36,24 @@ class KDEBase {
 }
 
 class KDENotification extends KDEBase {
+	events = new EventEmitter<{}>()
+
 	private _notID: number
 	notificationDataLoaded: Promise<void>
 
-	appName!: string
-	dismissable!: boolean
-	hasIcon!: boolean
-	silent!: boolean
-	text!: string
-	ticker!: string
-	title!: string
+	private _appName!: string
+	private _dismissable!: boolean
+	private _silent!: boolean
+	private _text!: string
+	private _ticker!: string
+	private _title!: string
+
+	get appName() { return this._appName }
+	get dismissable() { return this._dismissable }
+	get silent() { return this._silent }
+	get text() { return this._text }
+	get ticker() { return this._ticker }
+	get title() { return this._title }
 
 	protected async getProxyObject() {
 		return super.getProxyObject(`notifications/${this._notID}`)
@@ -63,19 +69,17 @@ class KDENotification extends KDEBase {
 		const {
 			appName,
 			dismissable,
-			hasIcon,
 			silent,
 			text,
 			ticker,
 			title,
 		} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device.notifications.notification')
-		this.appName = appName
-		this.dismissable = dismissable
-		this.hasIcon = hasIcon
-		this.silent = silent
-		this.text = text
-		this.ticker = ticker
-		this.ticker = title
+		this._appName = appName
+		this._dismissable = dismissable
+		this._silent = silent
+		this._text = text
+		this._ticker = ticker
+		this._title = title
 
 		Object.freeze(this)
 	}
@@ -99,6 +103,7 @@ interface eKDEMediaHandler {
 class KDEMediaHandler extends KDEBase {
 	events = new EventEmitter<eKDEMediaHandler>()
 
+	private _base: KDEDevice
 	private _volume!: number
 	private _length!: number
 	private _isPlaying!: boolean
@@ -108,10 +113,9 @@ class KDEMediaHandler extends KDEBase {
 	private _title!: string
 	private _artist!: string
 	private _album!: string
-	private _canSeek!: boolean
 
-	get volume() { return this._volume }
 	get length() { return this._length }
+	get volume() { return this._volume }
 	get isPlaying() { return this._isPlaying }
 	get position() { return this._position }
 	get player() { return this._player }
@@ -119,7 +123,6 @@ class KDEMediaHandler extends KDEBase {
 	get title() { return this._title }
 	get artist() { return this._artist }
 	get album() { return this._album }
-	get canSeek() { return this._canSeek }
 
 	mediaDataLoaded: Promise<void>
 
@@ -127,8 +130,10 @@ class KDEMediaHandler extends KDEBase {
 		return await super.getProxyObject('mprisremote')
 	}
 
-	constructor(id: string, bus = sessionBus()) {
-		super(id, bus)
+	constructor(base: KDEDevice, bus = sessionBus()) {
+		super(base.id, bus)
+		this._base = base
+		this._base.events.on("onReachableChanged", val => { if (val) this.init() })
 		this.mediaDataLoaded = this.init()
 	}
 
@@ -143,10 +148,13 @@ class KDEMediaHandler extends KDEBase {
 		return async () => await i.sendAction(str)
 	}
 
+	private interface?: ClientInterface
 	private async init() {
-		await this.retrieveData()
-		const i = await this.getInterface('', 'org.kde.kdeconnect.device.mprisremote')
-		i.on('propertiesChanged', this.retrieveData.bind(this))
+		await this.update()
+
+		this.interface?.off("propertiesChanged", this.retrieveDataBinding)
+		const i = this.interface = await this.getInterface('', 'org.kde.kdeconnect.device.mprisremote')
+		i.on('propertiesChanged', this.retrieveDataBinding)
 		this.Next = this.createRunCommandFun(i, 'Next')
 		this.Previous = this.createRunCommandFun(i, 'Previous')
 		this.Pause = this.createRunCommandFun(i, 'Pause')
@@ -155,7 +163,8 @@ class KDEMediaHandler extends KDEBase {
 		this.Play = this.createRunCommandFun(i, 'Play')
 	}
 
-	private async retrieveData() {
+	private retrieveDataBinding = this.update.bind(this)
+	async update() {
 		const {
 			volume,
 			length,
@@ -166,7 +175,6 @@ class KDEMediaHandler extends KDEBase {
 			title,
 			artist,
 			album,
-			canSeek,
 		} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device.mprisremote')
 
 		this._volume = volume
@@ -178,7 +186,6 @@ class KDEMediaHandler extends KDEBase {
 		this._title = title
 		this._artist = artist
 		this._album = album
-		this._canSeek = canSeek
 		this.events.emit('onMediaPlayerUpdated')
 	}
 }
@@ -190,7 +197,6 @@ interface eKDEDevice {
 	'onReachableChanged': (v: boolean) => void
 	'onBatteryChanged': (v: iKDEDeviceBattery) => void
 	'onConnectivityChanged': (v: iKDEDeviceConnectivity) => void
-	'onChanged': () => void
 }
 
 interface iKDEDeviceBattery {
@@ -203,7 +209,7 @@ interface iKDEDeviceConnectivity {
 	strength: number
 }
 
-class KDEDevice extends KDEBase {
+export class KDEDevice extends KDEBase {
 	events = new EventEmitter<eKDEDevice>()
 
 	private _setupDone = false
@@ -243,6 +249,10 @@ class KDEDevice extends KDEBase {
 		}
 		if (!this._isReachable) {
 			throw new Error('Cannot connect to KDEDevice!')
+		}
+
+		if (!this._isTrusted) {
+			throw new Error("KDEDevicey not trusted!")
 		}
 
 		return Promise.resolve()
@@ -307,6 +317,10 @@ class KDEDevice extends KDEBase {
 	}
 
 	async setup() {
+		if (this._setupDone) {
+			return
+		}
+
 		{
 			const {
 				isReachable,
@@ -321,6 +335,7 @@ class KDEDevice extends KDEBase {
 
 			const interf = await this.getInterface('', 'org.kde.kdeconnect.device')
 			interf.on('reachableChanged', i => {
+				console.log(i)
 				this._isReachable = i
 				if (i) {
 					this.iSetup()
@@ -370,7 +385,7 @@ class KDEDevice extends KDEBase {
 
 	async getMediaControl() {
 		this.wrapCheckSetup()
-		const n = new KDEMediaHandler(`/modules/kdeconnect/devices/${this.id}`, this._bus)
+		const n = new KDEMediaHandler(this, this._bus)
 		await n.mediaDataLoaded
 		return n
 	}
@@ -385,11 +400,21 @@ export async function getAvailableDevices() {
 	const bus = sessionBus()
 	const obj = await bus.getProxyObject('org.kde.kdeconnect.daemon', '/modules/kdeconnect/devices')
 	const dev = obj.nodes.map(i => new KDEDevice(i.slice(i.lastIndexOf('/') + 1), bus))
-	for(const i of dev){
+	for (const i of dev) {
 		await i.setup()
 	}
 
 	return dev
 }
 
-getAvailableDevices()
+
+async function main(){
+	let dev = await (await getAvailableDevices())[0].getMediaControl()
+	dev.events.on("onMediaPlayerUpdated", ()=>{
+		console.log(dev)
+	})
+
+	dev.Stop()
+}
+
+main()
