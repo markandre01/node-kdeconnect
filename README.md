@@ -131,3 +131,14 @@ Not externally accessible
 |Event|Values|Info
 |---|---|---|
 |`onMediaPlayerUpdated`| `()` | Called when any data changes. Can fire multiple times in succession; Does NOT fire when `position` changes|
+
+
+### Do To / Not supported yet
+
+- Pairing / Unpairing
+- Multiple Media Players
+- SFTP Bindings
+- Contacts / SMS / Telephone
+- Photo Requesting / Recieving
+- Remote Control / Keyboard
+- Remote Commands
