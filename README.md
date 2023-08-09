@@ -13,17 +13,15 @@ Small script using [DBus](https://github.com/dbusjs/node-dbus-next) to allow a N
 
 The API is written fully in Typescript, so check out the declaration file for additional infos
 
-### Device Retrieving and Basic Information
-
-#### `async getAvailableDevices()`
+### `async getAvailableDevices()`
 
 Returns a list of KDEDevices currently known or available
 
-#### `class KDEDevice`
+### `class KDEDevice`
 
 Can be manually created or retrieved using `getAvailableDevices`
 
-##### Constructor
+#### Constructor
 
 `KDEDevice(id, bus)`
 
@@ -33,7 +31,7 @@ Can be manually created or retrieved using `getAvailableDevices`
 |bus | `MessageBus` | optional, DBus-Session to use|
 
 
-##### Properties
+#### Properties
 
 |Name|Type|Info|
 |----|----|----|
@@ -45,7 +43,7 @@ Can be manually created or retrieved using `getAvailableDevices`
 |connectivity | `{type: string, strength: number}` | cellular data (not wifi) |
 |battery | `{charge: number, charging: boolean}` | battery status |
 
-##### Functions
+#### Functions
 
 |Signature|Info|
 |---|----|
@@ -58,7 +56,7 @@ Can be manually created or retrieved using `getAvailableDevices`
 |`async getNotifications(): Promise<KDENotification[]>`|Returns a list of notifications currently present on the device. See below|
 |`async getMediaControl(): Promise<KDEMediaHandler>`|Returns a separate handler for media control. See below|
 
-##### Events
+#### Events
 
 Every device has an event handler linked to it, accessible by the `events` Property.
 
@@ -71,12 +69,12 @@ Every device has an event handler linked to it, accessible by the `events` Prope
 |`onBatteryChanged`| `({charge: number, charging: boolean})`
 |`onConnectivityChanged`| `({type: string, strength: number})`
 
-#### `class KDENotification`
+### `class KDENotification`
 
-##### Constructor
+#### Constructor
 Not externally accessible
 
-##### Properties
+#### Properties
 
 |Name|Type|Info|
 |----|----|----|
@@ -87,21 +85,21 @@ Not externally accessible
 |ticker|string|Message short version|
 |title|string|Message title|
 
-##### Functions
+#### Functions
 
 |Signature|Info|
 |---|----|
 |`async dismiss(): Promise<boolean>`|Dismisses message on device. Returns `true` if message is dismissable, `false` otherwise|
-##### Events
+#### Events
 No events
 
 
-#### `class KDEMediaHandler`
+### `class KDEMediaHandler`
 
-##### Constructor
+#### Constructor
 Not externally accessible
 
-##### Properties
+#### Properties
 
 |Name|Type|Info|
 |----|----|----|
@@ -116,7 +114,7 @@ Not externally accessible
 |album|string|track album name|
 |canSeek|boolean|true, if track can be fast forwarded/backwarded|
 
-##### Functions
+#### Functions
 
 |Signature|Info|
 |---|----|
@@ -128,7 +126,7 @@ Not externally accessible
 |`async Stop(): Promise<void>`|Stop track|
 |`async update(): Promise<void>`|Manually update data; Use to keep track of `position`|
 
-##### Events
+#### Events
 
 |Event|Values|Info
 |---|---|---|
