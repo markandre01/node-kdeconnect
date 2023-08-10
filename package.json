@@ -3,16 +3,19 @@
   "version": "0.0.1",
   "description": "KDEConnect bindings for Node",
   "keywords": [
+    "node",
     "typescript",
-    "template"
+    "kdeconnect",
+    "kde"
   ],
   "author": {
-    "name": "Mark-André Schadow"
+    "name": "Mark-André Schadow",
+    "email": "schadow.markandre@gmail.com"
   },
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/markandre01/node-kdeconnect"
+    "url": "git+https://github.com/markandre01/node-kdeconnect.git"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
