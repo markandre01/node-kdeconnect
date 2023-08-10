@@ -75,16 +75,16 @@ export class KDEDevice {
         return entries as { [key: string]: any }
     }
 
+    private basicWrapCheckDeorator = basicWrapCheckDeorator.bind(undefined, this)
+    private wrapCheckDeorator = wrapCheckDeorator.bind(undefined, this)
+    private basicCheckSetup = basicCheckSetup.bind(undefined, this)
+    private checkSetup = checkSetup.bind(undefined, this)
+
     constructor(id: string, bus = sessionBus()) {
         this._id = id
         this._bus = bus
         this.media = new KDEMediaHandler(this, this._bus)
     }
-
-    private basicWrapCheckDeorator = basicWrapCheckDeorator.bind(undefined, this)
-    private wrapCheckDeorator = wrapCheckDeorator.bind(undefined, this)
-    private basicCheckSetup = basicCheckSetup.bind(undefined, this)
-    private checkSetup = checkSetup.bind(undefined, this)
 
     private async iSetup() {
         {
