@@ -13,7 +13,7 @@ Small script using [DBus](https://github.com/dbusjs/node-dbus-next) to allow a N
 
 The API is written fully in Typescript, so check out the declaration file for additional infos
 
-+### `async getAvailableDevices()`
+### `async getAvailableDevices()`
 
 Returns a list of KDEDevices currently known or available
 

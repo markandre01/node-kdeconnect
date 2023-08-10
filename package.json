@@ -28,7 +28,8 @@
     "clean:all": "npm run clean && (rm -r ./node_modules || true)",
     "lint": "eslint --ext .ts --fix src/**/*.ts",
     "serve": "nodemon ./src/index.ts",
-    "upgrade": "npx npm-check -u"
+    "upgrade": "npx npm-check -u",
+    "publish": "npm publish"
   },
   "devDependencies": {
     "@types/node": "^20.4.5",
