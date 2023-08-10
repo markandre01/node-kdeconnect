@@ -156,7 +156,6 @@ None
 
 ## Do To / Not supported yet
 
-- Pairing / Unpairing
 - Multiple Media Players
 - SFTP Bindings
 - Contacts / SMS / Telephone
