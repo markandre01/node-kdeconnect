@@ -60,6 +60,7 @@ export class KDEMediaHandler {
 		this._bus = bus
 		this.device.events.on('onReachableChanged', val => { if (val) this.init() })
 		this.device.events.on('onTrustedChanged', val => { if (val) this.init() })
+
 		if (this.device.isTrusted && this.device.isReachable) {
 			this.init()
 		}

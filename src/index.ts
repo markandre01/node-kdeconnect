@@ -1,7 +1,7 @@
 import { sessionBus } from 'dbus-next'
 import { KDEDevice } from './device'
 
-export {KDEDevice}
+export { KDEDevice }
 export async function getAvailableDevices() {
 	const bus = sessionBus()
 	const obj = await bus.getProxyObject('org.kde.kdeconnect.daemon', '/modules/kdeconnect/devices')
@@ -12,3 +12,11 @@ export async function getAvailableDevices() {
 
 	return dev
 }
+
+async function main() {
+	let list = await getAvailableDevices()
+	let dev = list[0]
+	dev.media.events.on("onMediaPlayerUpdated", () => console.log(dev.media))
+}
+
+main()

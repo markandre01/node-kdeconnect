@@ -1,0 +1,16 @@
+{
+  "name": "kdeconnect_examples",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mark-André Schadow",
+    "email": "schadow.markandre@gmail.com"
+  },
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markandre01/node-kdeconnect.git"
+  },
+  "dependencies": {
+    "kdeconnect": "^1.0.1"
+  }
+}
