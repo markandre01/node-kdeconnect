@@ -3,8 +3,8 @@ const { getAvailableDevices } = require("kdeconnect")
 // convert to two digit string
 function msToMinutesSeconds(ms) {
     let d = new Date(ms)
-    let minutes = d.getMinutes().toLocaleString("en-US", {minimumIntegerDigits: 2})
-    let seconds = d.getSeconds().toLocaleString("en-US", {minimumIntegerDigits: 2})
+    let minutes = d.getMinutes().toLocaleString("en-US", { minimumIntegerDigits: 2 })
+    let seconds = d.getSeconds().toLocaleString("en-US", { minimumIntegerDigits: 2 })
     return `${minutes}:${seconds}`
 }
 

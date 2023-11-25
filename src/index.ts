@@ -14,9 +14,9 @@ export async function getAvailableDevices() {
 }
 
 async function main() {
-	let list = await getAvailableDevices()
-	let dev = list[0]
-	dev.media.events.on("onMediaPlayerUpdated", () => console.log(dev.media))
+	const list = await getAvailableDevices()
+	const dev = list[0]
+	dev.media.events.on('onMediaPlayerUpdated', () => console.log(dev.media))
 }
 
 main()

@@ -152,10 +152,11 @@ export class KDEDevice {
 			isReachable,
 			isTrusted,
 			name,
+			isPaired,
 			type
 		} = await this.getPropertiesOfInterface('', 'org.kde.kdeconnect.device')
 		this._isReachable = isReachable
-		this._isTrusted = isTrusted
+		this._isTrusted = isTrusted || isPaired
 		this._name = name
 		this._type = type
 
