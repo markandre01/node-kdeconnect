@@ -32,7 +32,7 @@
     "publish": "npm publish"
   },
   "devDependencies": {
-    "@types/node": "^20.4.5",
+    "@types/node": "^22.7.6",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "conventional-changelog-cli": "^3.0.0",
